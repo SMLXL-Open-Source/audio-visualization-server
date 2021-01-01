@@ -26,12 +26,10 @@ spotifyApi.clientCredentialsGrant().then(
 router.get("/search", (req, res) => {
     let term = req.query.term
     spotifyApi
-        .searchTracks(term, { limit: 8 })
+        .searchTracks(term, { limit: 20 })
         .then((data) => {
             let results = data.body;
-            res.status(200).json({
-                results,
-            });
+            res.send(results)
         })
         .catch((err) => {
             console.log(err);
@@ -41,6 +39,21 @@ router.get("/search", (req, res) => {
 router.post('/features', (req, res) => {
     let id = req.query.id;
     spotifyApi.getAudioFeaturesForTrack(id).then((data) => {
+        let results = data.body;
+        res.status(200).json({
+            results,
+            success: true
+        })
+    }).catch(err => {
+        res.status(err.body.error.status).json({
+            err
+        })
+    })
+})
+
+router.post('/analysis', (req, res) => {
+    let id = req.query.id;
+    spotifyApi.getAudioAnalysisForTrack(id).then((data) => {
         let results = data.body;
         res.status(200).json({
             results,
